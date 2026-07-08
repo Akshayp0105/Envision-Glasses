@@ -24,6 +24,7 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
+#include <Update.h>
 
 // Define AI-THINKER ESP32-CAM Pin Mapping
 #define PWDN_GPIO_NUM     32
@@ -120,6 +121,34 @@ void handleStream() {
 // Handler for root page
 void handleRoot() {
   server.send(200, "text/html", "<h1>Envision Glasses active. Camera stream at <a href='/stream'>/stream</a></h1>");
+}
+
+// OTA Firmware Update Handler
+void handleOTAUpdate() {
+  HTTPUpload& upload = server.upload();
+  
+  if (upload.status == UPLOAD_FILE_START) {
+    Serial.printf("OTA Update: Starting flash of %s\n", upload.filename.c_str());
+    if (!Update.begin(UPDATE_SIZE_UNKNOWN)) {
+      Update.printError(Serial);
+    }
+  } else if (upload.status == UPLOAD_FILE_WRITE) {
+    if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+      Update.printError(Serial);
+    }
+  } else if (upload.status == UPLOAD_FILE_END) {
+    if (Update.end(true)) {
+      Serial.printf("OTA Update: Success! Rebooting...\n");
+      ESP.restart();
+    } else {
+      Update.printError(Serial);
+    }
+  }
+}
+
+void handleOTAStatus() {
+  server.send(200, "application/json", 
+    "{\"status\":\"ok\",\"firmware\":\"1.0.4\",\"board\":\"ESP32-CAM\"}");
 }
 
 void setupCamera() {
@@ -269,6 +298,8 @@ void setup() {
   // Start HTTP Server
   server.on("/", handleRoot);
   server.on("/stream", handleStream);
+  server.on("/update", HTTP_POST, handleOTAUpdate, handleOTAUpdate);
+  server.on("/ota-status", HTTP_GET, handleOTAStatus);
   server.begin();
   Serial.println("HTTP Video Server started.");
 
