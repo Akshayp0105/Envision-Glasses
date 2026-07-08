@@ -1,5 +1,10 @@
 # Envision Glasses
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Platform](https://img.shields.io/badge/platform-ESP32%20%7C%20Raspberry%20Pi%20%7C%20React%20Native-blue.svg)]()
+[![AI](https://img.shields.io/badge/AI-Google%20Gemini-4285F4.svg)](https://aistudio.google.com/)
+
 **An affordable, AI-powered smart mobility and assistance solution for visually impaired individuals.**
 
 Envision Glasses is a smart wearable designed to enhance independence, safety, and accessibility for visually impaired users in their daily lives. It combines a camera, AI-powered processing, ultrasonic sensors, and a mobile companion application to provide real-time audio feedback and guidance.
@@ -87,7 +92,17 @@ The companion app displays live BLE connection status, battery level, proximity 
 Envision/
 ├── README.md
 ├── LICENSE
+├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
+├── SECURITY.md
+├── CHANGELOG.md
 ├── .gitignore
+├── .env.example
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── docs/
+│   └── architecture.md
 ├── hardware/
 │   ├── esp32_cam/
 │   │   ├── esp32_cam.ino        # Arduino firmware for ESP32-CAM
