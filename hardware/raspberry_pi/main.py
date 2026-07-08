@@ -162,6 +162,11 @@ def perform_ai_ocr(image_frame):
 def main():
     speak("Envision Glasses system starting.")
     
+    # Validate Gemini API key
+    if not GEMINI_API_KEY:
+        print("WARNING: GEMINI_API_KEY not set. OCR will use simulated responses.")
+        print("Set it with: export GEMINI_API_KEY='your_key_here'")
+    
     # Open camera stream
     camera_index = 0
     cap = cv2.VideoCapture(camera_index)
