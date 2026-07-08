@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  mobile-app-lint:
+    name: Mobile App - Lint Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile_app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mobile_app/package-lock.json
+      - run: npm ci
+      - run: npx expo lint
+
+  simulator-check:
+    name: Simulator - Static Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate HTML
+        run: |
+          sudo apt-get install -y tidy
+          tidy -q -e simulator/index.html || true
+      - name: Check file structure
+        run: |
+          test -f simulator/index.html
+          test -f simulator/style.css
+          test -f simulator/app.js
+
+  hardware-check:
+    name: Hardware - File Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify firmware files exist
+        run: |
+          test -f hardware/esp32_cam/esp32_cam.ino
+          test -f hardware/raspberry_pi/main.py
+          test -f hardware/raspberry_pi/requirements.txt
+      - name: Check Python syntax
+        run: python3 -m py_compile hardware/raspberry_pi/main.py
