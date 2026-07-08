@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Envision Glasses - Interactive Web Simulator</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Web Dashboard Wrapper -->
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="logo">
+        <ion-icon name="eye-outline" class="logo-icon"></ion-icon>
+        <span class="logo-text">Envision Glasses <span class="logo-accent">Simulator</span></span>
+      </div>
+      <div class="system-status">
+        <div class="badge green">
+          <span class="pulse-dot"></span> Virtual Environment Ready
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Splitter -->
+    <main class="workspace">
+      
+      <!-- 1. LEFT PANEL: Hardware Glasses Simulator -->
+      <section class="panel glasses-panel">
+        <div class="panel-header">
+          <h2><ion-icon name="hardware-chip-outline"></ion-icon> Smart Glasses Hardware</h2>
+          <span class="status-indicator" id="glasses-power-led">Active</span>
+        </div>
+        
+        <!-- Camera Simulator Viewport -->
+        <div class="viewport-card">
+          <div class="viewport-overlay">
+            <span class="mode-tag" id="viewport-mode-tag">CAM FEED</span>
+            <span class="rec-dot"></span>
+          </div>
+          
+          <!-- Live Camera Stream or Scenario Visualizer -->
+          <div class="camera-stream-container">
+            <video id="webcam-video" autoplay playsinline class="hidden"></video>
+            <div id="scenario-view" class="scenario-visualizer">
+              <div class="scenario-icon-box">
+                <ion-icon name="image-outline"></ion-icon>
+              </div>
+              <h3 id="scenario-title">Default Street Crossing</h3>
+              <p id="scenario-desc">A standard crosswalk environment with pedestrian walkways and approaching traffic lights.</p>
+            </div>
+            <div class="shutter-flash" id="shutter-flash"></div>
+          </div>
+
+          <!-- Camera Stream Controls -->
+          <div class="viewport-controls">
+            <button class="control-btn" id="btn-use-webcam">
+              <ion-icon name="videocam-outline"></ion-icon> Use Webcam
+            </button>
+            <div class="select-container">
+              <select id="scenario-select">
+                <option value="street">Scenario: Pedestrian Street Crossing</option>
+                <option value="book">Scenario: Reading Book Pages</option>
+                <option value="medicine">Scenario: Pill Bottle Instructions</option>
+                <option value="construction">Scenario: Construction Warning Sign</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sensor Simulation Console -->
+        <div class="card sensor-card">
+          <h3><ion-icon name="options-outline"></ion-icon> Proximity Sensors & Trigger Buttons</h3>
+          
+          <!-- Distance range slider -->
+          <div class="control-group">
+            <div class="control-label">
+              <span>Ultrasonic Proximity Sensor</span>
+              <strong id="sensor-val-label">120 cm</strong>
+            </div>
+            <input type="range" id="sensor-distance-slider" min="10" max="300" value="120" class="range-slider">
+            <div class="range-markers">
+              <span>Close (Collision Warning)</span>
+              <span>Far (Safe)</span>
+            </div>
+          </div>
+
+          <!-- Push buttons built onto glasses frame -->
+          <div class="button-grid">
+            <button class="hardware-trigger-btn" id="hw-btn-scan">
+              <ion-icon name="camera"></ion-icon> Click Frame Button (Scan)
+            </button>
+            <button class="hardware-trigger-btn" id="hw-btn-assistant">
+              <ion-icon name="mic"></ion-icon> Click Temple Touchpad (AI)
+            </button>
+          </div>
+        </div>
+
+        <!-- System Log Output -->
+        <div class="card log-card">
+          <h3><ion-icon name="terminal-outline"></ion-icon> Glasses Hardware Console Log</h3>
+          <div class="terminal-log" id="terminal-logs">
+            <div class="log-line">[SYS] ESP32-CAM initialized successfully.</div>
+            <div class="log-line">[SYS] Wi-Fi Server started at 192.168.4.1.</div>
+            <div class="log-line">[SYS] BLE Advertisements online: "Envision-Glasses".</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. RIGHT PANEL: Companion Mobile App Frame Simulator -->
+      <section class="panel phone-panel">
+        <div class="phone-frame">
+          <div class="phone-speaker"></div>
+          
+          <!-- Phone Screen Container -->
+          <div class="phone-screen">
+            
+            <!-- Phone OS Status bar -->
+            <div class="os-status-bar">
+              <span id="os-clock">22:36</span>
+              <div class="os-status-icons">
+                <ion-icon name="wifi"></ion-icon>
+                <ion-icon name="bluetooth" class="accent-color" id="phone-ble-icon"></ion-icon>
+                <ion-icon name="battery-full" id="phone-battery-icon"></ion-icon>
+              </div>
+            </div>
+
+            <!-- Phone Header App Bar -->
+            <div class="app-bar">
+              <span class="app-bar-title" id="screen-title">Envision Hub</span>
+              <div class="app-bar-status">
+                <span class="status-dot green" id="app-conn-dot"></span>
+                <span id="app-conn-text" style="font-size: 11px; font-weight:600; color: #a1a1aa;">Connected</span>
+              </div>
+            </div>
+
+            <!-- Phone Screen Viewport (Dynamic content) -->
+            <div class="phone-content" id="phone-screen-content">
+              
+              <!-- TAB 1: DASHBOARD VIEW (Default) -->
+              <div class="screen-view active" id="view-dashboard">
+                <div class="phone-card bg-indigo">
+                  <div class="card-title-row">
+                    <span>BLE Pairing Manager</span>
+                    <ion-icon name="bluetooth-outline" size="large"></ion-icon>
+                  </div>
+                  <p id="ble-status-desc" class="desc-text">Paired with Envision Glasses (192.168.4.1)</p>
+                  <button class="phone-btn secondary" id="btn-toggle-pair">Disconnect Glasses</button>
+                </div>
+
+                <!-- Proximity HUD Widget -->
+                <div class="phone-card" id="proximity-hud-card">
+                  <div class="card-title-row">
+                    <span>Telemetry Diagnostics</span>
+                    <ion-icon name="speedometer-outline" size="large"></ion-icon>
+                  </div>
+                  <div class="hud-telemetry-row">
+                    <div class="hud-telemetry-item">
+                      <h4 id="hud-val-distance">120 cm</h4>
+                      <p>Obstacle Dist.</p>
+                    </div>
+                    <div class="hud-telemetry-item">
+                      <h4 id="hud-val-battery">85%</h4>
+                      <p>Hardware Battery</p>
+                    </div>
+                  </div>
+                  <div class="progress-bar-container">
+                    <div class="progress-fill green" id="hud-progress-fill" style="width: 40%;"></div>
+                  </div>
+                </div>
+
+                <!-- Warning Alert Banner -->
+                <div class="phone-alert-banner hidden" id="danger-alert-banner">
+                  <ion-icon name="warning" class="alert-icon-red"></ion-icon>
+                  <div class="alert-info">
+                    <h4>CRITICAL OBSTACLE</h4>
+                    <p id="alert-distance-text">Object detected under 40 cm. Take caution!</p>
+                  </div>
+                </div>
+
+                <!-- Shortcuts Header -->
+                <div class="phone-section-header">Companion Modules</div>
+                
+                <!-- 2x2 Grid Layout -->
+                <div class="shortcuts-grid">
+                  <div class="shortcut-item" onclick="switchPhoneTab('vision')">
+                    <div class="shortcut-icon icon-indigo"><ion-icon name="eye"></ion-icon></div>
+                    <h5>OCR Vision</h5>
+                    <p>Read text</p>
+                  </div>
+                  <div class="shortcut-item" onclick="switchPhoneTab('navigate')">
+                    <div class="shortcut-icon icon-green"><ion-icon name="navigate"></ion-icon></div>
+                    <h5>Navigation</h5>
+                    <p>Voice routes</p>
+                  </div>
+                  <div class="shortcut-item" onclick="switchPhoneTab('assistant')">
+                    <div class="shortcut-icon icon-pink"><ion-icon name="mic"></ion-icon></div>
+                    <h5>Assistant</h5>
+                    <p>AI Q&A</p>
+                  </div>
+                  <div class="shortcut-item" onclick="speakQuickDiagnostics()">
+                    <div class="shortcut-icon icon-yellow"><ion-icon name="volume-high"></ion-icon></div>
+                    <h5>Diagnostics</h5>
+                    <p>Play Status</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 2: AI VISION / OCR VIEW -->
+              <div class="screen-view hidden" id="view-vision">
+                <div class="mode-tabs">
+                  <button class="mode-tab active" id="tab-mode-ocr" onclick="setVisionMode('ocr')">Text OCR</button>
+                  <button class="mode-tab" id="tab-mode-describe" onclick="setVisionMode('describe')">Object Scanner</button>
+                </div>
+
+                <div class="phone-card container-padded">
+                  <p class="helper-msg" id="vision-mode-helper">Reads text signs, packaging descriptions, or booklets aloud.</p>
+                  <button class="phone-btn active" id="btn-phone-scan" style="background: #6366f1;">
+                    <ion-icon name="scan"></ion-icon> Trigger Camera Scan
+                  </button>
+                </div>
+
+                <div class="phone-card container-padded hidden" id="vision-results-card">
+                  <span class="results-tag">RESULTS FEEDBACK</span>
+                  <div class="results-scrolled">
+                    <p id="vision-results-text">OCR reads: 'Fresh Milk. Keep Refrigerated after opening. Best before December 2026.'</p>
+                  </div>
+                  <button class="replay-audio-btn" id="btn-replay-ocr">
+                    <ion-icon name="volume-medium-outline"></ion-icon> Replay Audio Speech
+                  </button>
+                </div>
+              </div>
+
+              <!-- TAB 3: NAVIGATION VIEW -->
+              <div class="screen-view hidden" id="view-navigate">
+                <div class="phone-card">
+                  <div class="input-field-group">
+                    <label>Navigate Destination</label>
+                    <div class="input-row">
+                      <input type="text" id="nav-destination-input" placeholder="Search park, pharmacy, store...">
+                      <button class="search-nav-btn" id="btn-start-nav"><ion-icon name="arrow-forward"></ion-icon></button>
+                    </div>
+                  </div>
+
+                  <div class="phone-section-header" style="margin-top:14px; margin-bottom:8px;">presets</div>
+                  <div class="presets-row">
+                    <span class="preset-pill" onclick="selectNavPreset('Pharmacy')"><ion-icon name="medical-outline"></ion-icon> Pharmacy</span>
+                    <span class="preset-pill" onclick="selectNavPreset('Central Park')"><ion-icon name="leaf-outline"></ion-icon> Central Park</span>
+                    <span class="preset-pill" onclick="selectNavPreset('Grocery Store')"><ion-icon name="cart-outline"></ion-icon> Grocery</span>
+                  </div>
+                </div>
+
+                <!-- Active Guidance Panel -->
+                <div class="phone-card hidden" id="nav-guidance-card">
+                  <div class="guidance-target-row">
+                    <div>
+                      <span class="nav-active-badge">GUIDANCE ROUTE ACTIVE</span>
+                      <h4 id="nav-target-name">Central Park</h4>
+                    </div>
+                    <button class="cancel-nav-btn" id="btn-cancel-nav"><ion-icon name="close"></ion-icon></button>
+                  </div>
+
+                  <div class="navigation-instruction-box">
+                    <ion-icon name="arrow-up-circle-outline" id="nav-step-icon"></ion-icon>
+                    <p id="nav-step-text">Starting route guidance to Central Park. Walk straight ahead for 50 meters.</p>
+                  </div>
+
+                  <div class="nav-navigation-row">
+                    <span id="nav-step-counter">Step 1 of 4</span>
+                    <button class="phone-btn active small" id="btn-next-nav-step">Next Step</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 4: ASSISTANT VIEW & MEDIA PLAYER -->
+              <div class="screen-view hidden" id="view-assistant">
+                <!-- Music Player Widget -->
+                <div class="phone-card bg-pink compact-card">
+                  <div class="media-row">
+                    <div class="media-icon"><ion-icon name="musical-note"></ion-icon></div>
+                    <div class="media-details">
+                      <h5 id="music-track-name">Self-Reliance Audiobook</h5>
+                      <p id="music-track-artist">Ralph Waldo Emerson</p>
+                    </div>
+                    <div class="media-actions">
+                      <button class="media-btn" id="media-prev"><ion-icon name="play-back"></ion-icon></button>
+                      <button class="media-btn main" id="media-play"><ion-icon name="play"></ion-icon></button>
+                      <button class="media-btn" id="media-next"><ion-icon name="play-forward"></ion-icon></button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Chat History Logs -->
+                <div class="chat-logs-container" id="chat-messages">
+                  <div class="chat-bubble assistant">Hello! I am your Envision AI assistant. Ask me anything about your surroundings or double tap the mic.</div>
+                </div>
+
+                <!-- Chat input -->
+                <div class="chat-input-bar">
+                  <input type="text" id="chat-input-text" placeholder="Type prompt to assistant...">
+                  <button class="chat-send-btn" id="btn-send-chat"><ion-icon name="send"></ion-icon></button>
+                  <button class="chat-mic-btn" id="btn-mic-chat"><ion-icon name="mic"></ion-icon></button>
+                </div>
+              </div>
+
+              <!-- TAB 5: SETTINGS VIEW -->
+              <div class="screen-view hidden" id="view-settings">
+                <div class="phone-card container-padded">
+                  <div class="input-field-group">
+                    <label>Gemini API Key</label>
+                    <div class="input-row">
+                      <input type="password" id="settings-api-key" placeholder="Paste Google AI Studio Key">
+                      <button class="settings-save-btn" id="btn-save-key">Save</button>
+                    </div>
+                    <p class="field-hint">Enables deep AI-powered question answering & multimodal image analysis.</p>
+                  </div>
+                </div>
+
+                <div class="phone-card">
+                  <div class="setting-toggle-row">
+                    <div class="setting-info">
+                      <h5>Speech Synthesis Rate</h5>
+                      <p>Adjust text voice readout speed</p>
+                    </div>
+                    <div class="speed-controller">
+                      <button class="speed-btn" onclick="adjustSimulatorSpeechRate(-0.1)">-</button>
+                      <span id="label-speech-speed">1.0x</span>
+                      <button class="speed-btn" onclick="adjustSimulatorSpeechRate(0.1)">+</button>
+                    </div>
+                  </div>
+
+                  <hr class="card-divider">
+
+                  <div class="setting-toggle-row">
+                    <div class="setting-info">
+                      <h5>Haptic Alerts</h5>
+                      <p>Trigger phone warning vibrations</p>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" id="settings-toggle-haptic" checked>
+                      <span class="slider-switch"></span>
+                    </label>
+                  </div>
+
+                  <hr class="card-divider">
+
+                  <div class="setting-toggle-row">
+                    <div class="setting-info">
+                      <h5>Buzzer Beeps</h5>
+                      <p>Enable sound pulses on hardware</p>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox" id="settings-toggle-buzzer" checked>
+                      <span class="slider-switch"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="phone-card container-padded">
+                  <button class="phone-btn active green" id="btn-calibrate-sensors">
+                    <ion-icon name="pulse-outline"></ion-icon> Calibrate Proximity Sensors
+                  </button>
+                  <div class="diag-specs">
+                    <div class="diag-line"><span>Firmware</span> <strong>v1.0.4-stable</strong></div>
+                    <div class="diag-line"><span>MAC Address</span> <strong>24:0A:C4:8B:58:A2</strong></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Phone Screen Bottom Navigation tabs -->
+            <nav class="phone-tabs">
+              <button class="tab-item active" id="tab-dashboard" onclick="switchPhoneTab('dashboard')">
+                <ion-icon name="home-outline"></ion-icon>
+                <span>Status</span>
+              </button>
+              <button class="tab-item" id="tab-vision" onclick="switchPhoneTab('vision')">
+                <ion-icon name="eye-outline"></ion-icon>
+                <span>Vision</span>
+              </button>
+              <button class="tab-item" id="tab-navigate" onclick="switchPhoneTab('navigate')">
+                <ion-icon name="navigate-outline"></ion-icon>
+                <span>Routes</span>
+              </button>
+              <button class="tab-item" id="tab-assistant" onclick="switchPhoneTab('assistant')">
+                <ion-icon name="mic-outline"></ion-icon>
+                <span>AI Voice</span>
+              </button>
+              <button class="tab-item" id="tab-settings" onclick="switchPhoneTab('settings')">
+                <ion-icon name="settings-outline"></ion-icon>
+                <span>Settings</span>
+              </button>
+            </nav>
+
+          </div>
+          <!-- Home button bar -->
+          <div class="phone-home-indicator"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Ionicons CDN Script loading -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <!-- Application Main Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
