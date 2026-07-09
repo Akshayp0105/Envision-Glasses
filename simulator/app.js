@@ -382,10 +382,10 @@ function initEventListeners() {
   // Navigation handlers
   document.getElementById("btn-start-nav").addEventListener("click", () => {
     const input = document.getElementById("nav-destination-input").value;
-    startNavguidance(input);
+    startNavigation(input);
   });
   document.getElementById("btn-cancel-nav").addEventListener("click", () => {
-    cancelNavguidance();
+    cancelNavigation();
   });
 }
 
@@ -556,7 +556,7 @@ function changeAudioTrack(dir) {
 let navigationSteps = [];
 let navStepIndex = 0;
 
-function startNavguidance(destinationName) {
+function startNavigation(destinationName) {
   const target = destinationName ? destinationName.trim() : "Pharmacy";
   let steps = NAV_ROUTES[target];
 
@@ -586,7 +586,7 @@ function startNavguidance(destinationName) {
 
 function selectNavPreset(preset) {
   document.getElementById("nav-destination-input").value = preset;
-  startNavguidance(preset);
+  startNavigation(preset);
 }
 
 function advanceNavStep() {
@@ -608,11 +608,11 @@ function advanceNavStep() {
     speakText(text);
   } else {
     speakText("Guidance completed. You have arrived at your destination.");
-    cancelNavguidance();
+    cancelNavigation();
   }
 }
 
-function cancelNavguidance() {
+function cancelNavigation() {
   document.getElementById("nav-guidance-card").classList.add("hidden");
   document.getElementById("nav-destination-input").value = "";
   navigationSteps = [];

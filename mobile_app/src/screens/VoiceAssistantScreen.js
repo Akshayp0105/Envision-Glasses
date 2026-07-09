@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { askAssistant } from '../services/geminiService';
@@ -18,6 +18,8 @@ export default function VoiceAssistantScreen() {
   const [inputText, setInputText] = useState("");
   const [isResponding, setIsResponding] = useState(false);
   const [isListening, setIsListening] = useState(false);
+
+  const scrollViewRef = useRef(null);
 
   // Music Player States
   const [isPlaying, setIsPlaying] = useState(false);
@@ -142,8 +144,8 @@ export default function VoiceAssistantScreen() {
       <ScrollView 
         style={styles.chatViewport} 
         contentContainerStyle={styles.chatContent}
-        ref={(ref) => { this.scrollView = ref; }}
-        onContentSizeChange={() => this.scrollView?.scrollToEnd({ animated: true })}
+        ref={scrollViewRef}
+        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
       >
         {messages.map((msg) => (
           <View 
